@@ -11,6 +11,8 @@ function sdc($newCase, $baseCase) {
         $similarities[] = [
             'id_kasus' => $bc['id_kasus'],
             'id_minatbakat' => $bc['id_minatbakat'],
+            'minat_bakat' => $bc['minat_bakat'],
+            'stimulasi' => $bc['stimulasi'],
             'sorensen_coefficient' => $sorensenCoefficient
         ];
     }

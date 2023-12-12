@@ -112,15 +112,16 @@ class Api extends BaseController
             $pernyataanSiswaModel->insertData($data_pernyataansiswa);
             //$id_pernyataansiswa = $pernyataanSiswaModel->getInsertID();
 
-            // Perhitungan Sorensen-Dice Coefficient pada data yang ada di 'base_case'
+            // Perhitungan Sorensen-Dice Coefficient pada data yang ada
             $basecmodel = new BaseCaseModel();
             $baseCase = $basecmodel->GetCaseBasePernyataan();
             $sdc = sdc($data_pernyataansiswa['id_pernyataan'], $baseCase);
 
-            // Commit jika semua operasi ( termasuk query ) berhasil
+            $kasusModel->where('id_kasus', $id_kasus)->set('id_minatbakat', $sdc[0]['id_minatbakat'])->update();
+
+            // Commit jika semua operasi berhasil
             $this->db->transCommit();
 
-            // Set isi Respond ke Request
             $data = [
                 'success' => true,
                 'message' => 'Data berhasil disimpan.',
@@ -129,13 +130,14 @@ class Api extends BaseController
                 'umur' => $data_siswa['umur'],
                 'jenis_kelamin' => $data_siswa['jenis_kelamin'],
                 'kelas' => $data_siswa['kelas'],
+                'minat_bakat' => $sdc[0]['minat_bakat'],
+                'stimulasi' => $sdc[0]['stimulasi'],
                 'hasil_sdc' => $sdc,
             ];
         } catch (\Exception $except) {
-            // Rollback jika terjadi error
+            // Rollback jika terjadi kesalahan
             $this->db->transRollback();
 
-            // Set isi Respond ke Request
             $data = [
                 'success' => false,
                 'message' => 'Gagal menyimpan data.',
