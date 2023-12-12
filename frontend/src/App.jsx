@@ -13,7 +13,7 @@ export default function App() {
           jenis_kelamin: "L",
           id_pernyataan: ['C1', 'C7'],
         });
-        setQuestion(response.data)
+        setQuestion(response.data['hasil_sdc'])
       } catch (error) {
         console.log(error)
       } finally {
@@ -28,14 +28,11 @@ export default function App() {
     isLoading !== true &&
     <div className="w-full min-h-screen bg-slate-50">
       <h1>Sorensen</h1>
-      {responseData && (
-      <pre>{JSON.stringify(responseData, null, 2)}</pre>
-      )}
-      {/* {
+      {
         question.map((value, index) => {
-          return <p key={index}>{value}</p>
+          return <p key={index}>{value.sorensen_coefficient}</p>
         })
-      } */}
+      }
     </div>
   )
 }
