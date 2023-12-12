@@ -15,6 +15,14 @@ class Api extends BaseController
 {
     use ResponseTrait;
 
+    protected $db;
+
+    public function __construct()
+    {
+        // Load database service
+        $this->db = \Config\Database::connect();
+    }
+
     public function index()
     {
         // Deklarasi models
@@ -81,48 +89,60 @@ class Api extends BaseController
         $data_siswa['umur'] = $this->request->getJSON()->umur;
         $data_siswa['jenis_kelamin'] = $this->request->getJSON()->jenis_kelamin;
         $data_siswa['kelas'] = $this->request->getJSON()->kelas;
-        
-        // Simpan data siswa ke tabel 'siswa'
-        $siswaModel = new SiswaModel();
-        $siswaModel->insertData($data_siswa);
-        $id_siswa = $siswaModel->getInsertID(); // Ambil ID siswa yang baru saja dimasukkan ke tabel `siswa`
-        
-        // Tambah kasus baru ke tabel 'kasus'
-        $kasusModel = new KasusModel();
-        $data_kasus['id_siswa'] = $id_siswa;
-        $kasusModel->insertData($data_kasus);
-        $id_kasus = $kasusModel->getInsertID();
-        
-        // Simpan pilihan pernyataan ke dalam tabel 'pernyataan_siswa'
-        $pernyataanSiswaModel = new PernyataanSiswaModel();
-        $data_pernyataansiswa['id_pernyataan'] = $this->request->getJSON()->id_pernyataan;
-        $data_pernyataansiswa['id_kasus'] = $id_kasus;
-        $pernyataanSiswaModel->insertData($data_pernyataansiswa);
-        //$id_pernyataansiswa = $pernyataanSiswaModel->getInsertID();
 
-        $basecmodel = new BaseCaseModel();
-        $baseCase = $basecmodel->GetCaseBasePernyataan();
+        // Mulai transaksi
+        $this->db->transStart();
 
-        $sdc = sdc($data_pernyataansiswa['id_pernyataan'], $baseCase);
+        try {
+            // Simpan data siswa ke tabel 'siswa'
+            $siswaModel = new SiswaModel();
+            $siswaModel->insertData($data_siswa);
+            $id_siswa = $siswaModel->getInsertID();
 
-        // Set data Respond
-        $data = [
-            'msg' => 'Berhasil~!',
-            'id_siswa' => $id_siswa,
-            'id_kasus' => $id_kasus,
-            'umur' => $data_siswa['umur'],
-            'jenis_kelamin' => $data_siswa['jenis_kelamin'],
-            'kelas' => $data_siswa['kelas'],
-            'hasil_sdc' => $sdc,
-        ];
+            // Tambah kasus baru ke tabel 'kasus'
+            $kasusModel = new KasusModel();
+            $data_kasus['id_siswa'] = $id_siswa;
+            $kasusModel->insertData($data_kasus);
+            $id_kasus = $kasusModel->getInsertID();
 
-        $kasusModel->where('id_kasus', $id_kasus)->set('id_minatbakat', $sdc[0]['id_minatbakat'])->update();
+            // Simpan pilihan pernyataan ke dalam tabel 'pernyataan_siswa'
+            $pernyataanSiswaModel = new PernyataanSiswaModel();
+            $data_pernyataansiswa['id_pernyataan'] = $this->request->getJSON()->id_pernyataan;
+            $data_pernyataansiswa['id_kasus'] = $id_kasus;
+            $pernyataanSiswaModel->insertData($data_pernyataansiswa);
+            //$id_pernyataansiswa = $pernyataanSiswaModel->getInsertID();
 
-        // Respon ke Request
-        if ($data) {
-            return $this->respond($data);
-        } else {
-            return $this->failNotFound('Tidak berhasil.');
+            // Perhitungan Sorensen-Dice Coefficient pada data yang ada di 'base_case'
+            $basecmodel = new BaseCaseModel();
+            $baseCase = $basecmodel->GetCaseBasePernyataan();
+            $sdc = sdc($data_pernyataansiswa['id_pernyataan'], $baseCase);
+
+            // Commit jika semua operasi ( termasuk query ) berhasil
+            $this->db->transCommit();
+
+            // Set isi Respond ke Request
+            $data = [
+                'success' => true,
+                'message' => 'Data berhasil disimpan.',
+                'id_siswa' => $id_siswa,
+                'id_kasus' => $id_kasus,
+                'umur' => $data_siswa['umur'],
+                'jenis_kelamin' => $data_siswa['jenis_kelamin'],
+                'kelas' => $data_siswa['kelas'],
+                'hasil_sdc' => $sdc,
+            ];
+        } catch (\Exception $except) {
+            // Rollback jika terjadi error
+            $this->db->transRollback();
+
+            // Set isi Respond ke Request
+            $data = [
+                'success' => false,
+                'message' => 'Gagal menyimpan data.',
+                'error' => $except->getMessage(),
+            ];
         }
+
+        return $this->respond($data);
     }
 }
