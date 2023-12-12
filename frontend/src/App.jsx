@@ -45,13 +45,13 @@ export default function App() {
     for (let index = 0; index < answer.length; index++) {
       if (answer[index] == true) {
         let temptIdPernyataan
-        temptIdPernyataan = "C" + ++index
+        temptIdPernyataan = "C"+ ++index
         newAnswer.push(temptIdPernyataan)
       }
     }
     axios.post('http://localhost:8081/Api', {
-      "umur": ageAnswer,
-      "jenis_kelamin": genderAnswer,
+      "umur" : ageAnswer,
+      "jenis_kelamin" : genderAnswer,
       "kelas": classAnswer,
       "id_pernyataan": newAnswer
     }).then((response) => {

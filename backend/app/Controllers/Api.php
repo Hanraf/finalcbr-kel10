@@ -21,8 +21,10 @@ class Api extends BaseController
     {
         // Load database service
         $this->db = \Config\Database::connect();
-        header('Access-Control-Allow-Origin: *');
-        header("Access-Control-Allow-Methods: *");
+        header('Access-Control-Allow-Origin: *'); //for allow any domain, insecure
+        header('Access-Control-Allow-Headers: *'); //for allow any headers, insecure
+        header("Content-Type: *");
+        header('Access-Control-Allow-Methods: *'); //method allowed
     }
 
     public function index()
