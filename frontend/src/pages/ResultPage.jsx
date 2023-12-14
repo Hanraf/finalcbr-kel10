@@ -7,8 +7,6 @@ export default function ResultPage() {
   let location = useLocation();
   useEffect(() => {
     setResult(location.state.result)
-    console.log(location)
-    console.log(location.state.result)
     setIsLoading(false)
   }, [location]);
 
@@ -51,16 +49,21 @@ export default function ResultPage() {
               <h1 className='font-semibold text-5xl w-fit text-indigo-500 my-8 px-6 py-4 rounded-md bg-indigo-100'>
                 {result.minat_bakat}
               </h1>
-              <div className='text-indigo-500'> Hasil perhitungan Sørensen–Dice :
-                {
-                  result.hasil_sdc.map((valueOfHasilSdc) => {
-                    if (valueOfHasilSdc.minat_bakat == result.minat_bakat) {
-                      const hasil = valueOfHasilSdc.sorensen_coefficient * 100;
-                      const angka = hasil.toString().substr(0, 5);
-                      return " " + Number(angka)
-                    }
-                  })
-                }%
+              <div className='text-sm'> Hasil Sørensen–Dice :
+                <br />
+                <div className='pb-2 text-base text-indigo-500 border-b-2 border-b-indigo-500 font-medium'>
+                  {
+                    result.hasil_sdc.map((valueOfHasilSdc) => {
+                      if (valueOfHasilSdc.minat_bakat == result.minat_bakat) {
+                        const hasil = valueOfHasilSdc.sorensen_coefficient * 100;
+                        const angka = hasil.toString().substr(0, 5);
+                        return " " + Number(angka)
+                      }
+                    })
+                  }%
+                  seorang yang
+                  {" " + result.minat_bakat}
+                </div>
               </div>
             </section>
           </main>

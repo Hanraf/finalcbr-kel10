@@ -1,9 +1,7 @@
-/* eslint-disable no-unused-vars */
 import axios from "axios"
 import { useEffect, useState } from "react"
 import Card from "../components/Card"
 import { useNavigate } from "react-router-dom"
-import _ from "lodash";
 
 export default function App() {
   const [question, setQuestion] = useState(null)
@@ -20,7 +18,6 @@ export default function App() {
     const number = Number(angka);
     const hasil = number - 1;
     let newAnswer
-    console.log(idVal, hasil, isYes)
 
     newAnswer = answer.map((value, index) => {
       if (index == hasil) {
@@ -42,7 +39,7 @@ export default function App() {
         newAnswer.push(temptIdPernyataan)
       }
     }
-    axios.post('http://localhost:8081/Api', {
+    axios.post('http://localhost:8080/Api', {
       "umur": ageAnswer,
       "jenis_kelamin": genderAnswer,
       "kelas": classAnswer,
@@ -56,17 +53,8 @@ export default function App() {
     })
   }
 
-
-  // useEffect(() => {
-  //   console.log(answer)
-  // },[answer])
-  // useEffect(() => {
-  //   console.log(question)
-  // },[question])
-
-
   useEffect(() => {
-    axios.get('http://localhost:8081/Api').then((response) => {
+    axios.get('http://localhost:8080/Api').then((response) => {
 
       setQuestion(response.data.pernyataan)
       let element = []
@@ -92,11 +80,23 @@ export default function App() {
           Sørensen–Dice coefficient
         </h1>
       </nav>
-      <aside className="sticky top-32 left-0 bg-slate-50 w-80 h-fit p-10 text-center">
-        <small>Soal terjawab:</small>
-        <h3 className="text-7xl text-rose-500 my-2">
-          0/59
+      <aside className="sticky top-32 left-0 bg-slate-50 w-80 h-fit p-6">
+        <h3 className="text-2xl text-rose-500 mb-5 pl-3 py-1 border-l-[8px] border-rose-100 font-semibold">
+          Peraturan
         </h3>
+        <ol className="list-decimal text-sm list-inside">
+          <li>Jawablah <b className="text-sm text-rose-500 font-medium">seluruh</b> Pertanyaan dan Pernyataan</li>
+          <li className="text-sm my-3">Pada bagian
+            <b className="text-rose-500 font-medium"> Pertanyaan kepribadian </b>
+            pilih
+            <b className="text-rose-500 font-medium"> Iya </b>
+            atau
+            <b className="text-rose-500 font-medium"> Tidak </b>
+          </li>
+          <li>Tidak ada jawaban yang salah atau benar,
+            <b className="text-rose-500 font-medium"> Sesuai hati nurani anda </b>
+          </li>
+        </ol>
       </aside>
       <main className="flex-1 min-h-screen py-12">
         <section className="mt-20">
@@ -106,7 +106,7 @@ export default function App() {
               <input className="block w-full px-2 py-1 border outline-none focus:outline-indigo-500 focus:border-indigo-300" type="number" value={ageAnswer}
                 onChange={(e) => {
                   setAgeAnswer(e.target.value)
-                }} />
+                }} required />
             </div>
           </Card>
           <Card index={1} isi_pernyataan={"Jenis Kelamin"} >
@@ -137,17 +137,18 @@ export default function App() {
           <div className="mb-6 font-semibold text-3xl">🤔 Pertanyaan kepribadian 🤔</div>
           {
             question.map((value, index) => {
+              let temptIdPernyataan = Number(value.id_pernyataan.slice(1)) - 1
               return (
-                <Card key={index} index={index} isi_pernyataan={value.isi_pernyataan} is_answered={answer[index]} handleAnswer={handleAnswer} >
+                <Card key={index} index={index} isi_pernyataan={value.isi_pernyataan} is_answered={answer[temptIdPernyataan]} handleAnswer={handleAnswer} >
                   <div className="flex items-center gap-4">
-                    <input className="w-5 aspect-square cursor-pointer accent-indigo-500" type="radio" name={`${value.id_pernyataan}`} value={true}
+                    <input required className="w-5 aspect-square cursor-pointer accent-indigo-500" type="radio" name={`${value.id_pernyataan}`} value={true}
                       id={`${value.id_pernyataan}-true`} onChange={(e) => {
                         handleAnswer(e.target.name, e.target.value)
                       }} />
                     <label className="cursor-pointer hover:font-medium" htmlFor={`${value.id_pernyataan}-true`}>Iya</label>
                   </div>
                   <div className="flex items-center gap-4 mt-4">
-                    <input className="w-5 aspect-square cursor-pointer accent-indigo-500" type="radio" name={`${value.id_pernyataan}`} value={false} id={`${value.id_pernyataan}-false`} onChange={(e) => {
+                    <input required className="w-5 aspect-square cursor-pointer accent-indigo-500" type="radio" name={`${value.id_pernyataan}`} value={false} id={`${value.id_pernyataan}-false`} onChange={(e) => {
                       handleAnswer(e.target.name, e.target.value)
                     }} />
                     <label className="cursor-pointer hover:font-medium" htmlFor={`${value.id_pernyataan}-false`}>Tidak</label>

@@ -1,7 +1,7 @@
 import PropsTypes from 'prop-types'
 
-// eslint-disable-next-line react/prop-types, no-unused-vars
-export default function Card({ index, isi_pernyataan, children,is_answered }) {
+// eslint-disable-next-line react/prop-types
+export default function Card({ index, isi_pernyataan, children, is_answered }) {
   return (
     <div className="mb-10 bg-slate-50 p-10 rounded-sm">
       <small className={`font-semibold rounded-full px-3 py-1 text-xs 
@@ -21,5 +21,4 @@ export default function Card({ index, isi_pernyataan, children,is_answered }) {
 Card.propTypes = {
   index: PropsTypes.number,
   isi_pernyataan: PropsTypes.string,
-  // children: PropsTypes.array,
 }
