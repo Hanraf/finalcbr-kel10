@@ -53,13 +53,21 @@ export default function ResultPage() {
                 <br />
                 <div className='pb-2 text-base text-indigo-500 border-b-2 border-b-indigo-500 font-medium'>
                   {
-                    result.hasil_sdc.map((valueOfHasilSdc) => {
-                      if (valueOfHasilSdc.minat_bakat == result.minat_bakat) {
-                        const hasil = valueOfHasilSdc.sorensen_coefficient * 100;
-                        const angka = hasil.toString().substr(0, 5);
-                        return " " + Number(angka)
-                      }
-                    })
+                    result.hasil_sdc
+                    .filter(valueOfHasilSdc => valueOfHasilSdc.minat_bakat === result.minat_bakat)
+                    .map((valueOfHasilSdc, index) => {
+                      const hasil = valueOfHasilSdc.sorensen_coefficient * 100;
+                      const angka = hasil.toString().substr(0, 5);
+                      const hasilTertinggi = "Dekat dengan kasus " + valueOfHasilSdc.id_kasus + " sebanyak " + Number(angka);
+                      return index === 0 ? hasilTertinggi : null;
+                    })      
+                    // result.hasil_sdc.map((valueOfHasilSdc) => {
+                    //   if (valueOfHasilSdc.minat_bakat == result.minat_bakat) {
+                    //     const hasil = valueOfHasilSdc.sorensen_coefficient * 100;
+                    //     const angka = hasil.toString().substr(0, 5);
+                    //     return " Dekat dengan kasus "+ valueOfHasilSdc.id_kasus + " sebanyak " + Number(angka);
+                    //   }
+                    // })
                   }%
                   seorang yang
                   {" " + result.minat_bakat}
